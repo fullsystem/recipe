@@ -2,6 +2,7 @@
   "name": "fullsystem/starter",
   "version": "0.1.0",
   "driver": "laravel-react",
+  "source": "source",
   "phases": {
     "pre-install": [
       {
@@ -13,7 +14,9 @@
         ]
       },
       {
-        "composer": ["baconfy/factory-payload"],
+        "composer": [
+          "baconfy/factory-payload"
+        ],
         "dev": true
       },
       {
@@ -25,7 +28,9 @@
         ]
       },
       {
-        "artisan": ["test"]
+        "artisan": [
+          "test"
+        ]
       },
       {
         "remove": [
@@ -51,10 +56,9 @@
     ],
     "post-install": [
       {
-        "artisan": ["wayfinder:generate --with-form"]
-      },
-      {
-        "build": []
+        "artisan": [
+          "wayfinder:generate --with-form"
+        ]
       }
     ]
   }
