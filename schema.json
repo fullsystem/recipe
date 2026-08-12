@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "driver": "laravel-react",
   "source": "source",
+  "requires": ["fresh-project"],
   "phases": {
     "pre-install": [
       {
@@ -25,11 +26,6 @@
           "react-markdown",
           "pusher-js",
           "date-fns"
-        ]
-      },
-      {
-        "artisan": [
-          "test"
         ]
       },
       {
