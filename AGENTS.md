@@ -4,9 +4,16 @@ A **recipe** for [fullsystem/install](https://github.com/fullsystem/install):
 files that mirror a project root, and a `schema.json` declaring what has to
 happen for those files to work.
 
-This repository is not an application. There is no `composer.json` here and
-nothing to run — it is a payload. It gets installed into somebody else's
-project, which is where it becomes code that executes.
+What is in `src/` is not an application — it is a payload. It gets installed
+into somebody else's project, which is where it becomes code that executes.
+
+The root around it is a different thing, and it is there so the payload can be
+worked on: a Composer package requiring `orchestra/testbench`, whose
+[Workbench](https://packages.tools/workbench.html) boots a Laravel application
+that serves `src/` for real, with Inertia, React and hot reload. None of that
+scaffolding — `composer.json`, `package.json`, `vite.config.ts`,
+`testbench.yaml`, `workbench/` — reaches an installed project. See
+[Trying a change](#trying-a-change).
 
 ## Where the documentation lives
 
@@ -21,9 +28,13 @@ This file is for whoever changes what is in this repository. Everyone
 contributing is assumed to be doing it with an assistant, and this is what the
 assistant reads.
 
-`.ai/` holds documentation too long for this file. Read what is in there before
-assuming this file is everything. It is empty for now: the directory is the
-convention, not a promise that it has been filled in.
+`.ai/` holds documentation too long for this file, and `.ai/rules/` is the part
+you cannot skip: one file per rule, on how code gets written here and the
+decisions that go wrong by default. Start at [`.ai/rules/index.md`](.ai/rules/index.md),
+and read the rule before writing the file it governs rather than after.
+
+The rules are about building a recipe, not about the theme a recipe installs.
+Like everything outside `src/`, they stay in this repository.
 
 ## The two parts
 
@@ -35,8 +46,8 @@ src/            files that mirror the project root
 `src/resources/js/pages/dashboard.tsx` lands at
 `resources/js/pages/dashboard.tsx`. No path mapping, nothing to configure.
 
-Anything outside `src/` — this file, the README, the licence, CI config — stays
-here and never reaches a project. `src` is the default; a recipe keeping its
+Anything outside `src/` — this file, the README, the licence, CI config, the
+Workbench scaffolding — stays here and never reaches a project. `src` is the default; a recipe keeping its
 files elsewhere says so in the schema's `source`.
 
 Files are copied over whatever is there, and directories are created as needed.
@@ -61,6 +72,40 @@ anyway.
    - something imported but not shipped, like generated route helpers →
      `post-install`
    - something that has to exist before these files land → `pre-install`
+
+**Name a file for what it is, not for what it replaces.** Landing on top of
+`resources/js/pages/welcome.tsx` is a decision with a cost — the project's page
+is gone, and only the installer's rollback brings it back. A recipe proving it
+installed does not need to destroy anything to do it, which is why the example
+page here is `how-to-start`. Overwrite a project's file when replacing it *is*
+the recipe; never merely to be noticed.
+
+### Imports, and the two component roots
+
+Write them the way the installed project will — `@/components/ui/input` — never
+a relative path into `workbench/`.
+
+`@` means `resources/js` in a project. Here it means two directories, tried in
+order:
+
+```
+src/resources/js         the recipe's own files — what ships
+workbench/resources/js   stand-ins for what the target project already has
+```
+
+`src/` first is the whole point. Ship `src/resources/js/components/ui/input.tsx`
+and it shadows the workbench copy while you develop, exactly as it will overwrite
+the starter kit's file once installed. A relative import reaching into
+`workbench/` compiles here and breaks on arrival; it is the one import that is
+always wrong.
+
+Which root a component belongs in is the same question as whether the recipe
+ships it. Something you only need in order to *see* a page — a starter kit
+button, a layout the recipe assumes is already there — goes in `workbench/`.
+Anything in `src/` is a promise to install it.
+
+The list is written twice, in `tsconfig.json`'s `paths` and in `vite.config.ts`
+— the editor reads one, the bundler the other. Change one and change the other.
 
 **`remove` is the dangerous one.** Two kinds of path qualify and only two: files
 that conflict with ours without being overwritten by them, and files that would
@@ -200,9 +245,64 @@ links to `fullsystem/install`.
 
 ## Trying a change
 
-There is nothing to run here. A change is tested by installing it into a project
-you do not mind losing — and the installer fetches from GitHub, never from a
-working copy, so it has to be pushed first:
+Two ways, answering two different questions.
+
+### Locally, with Workbench
+
+```bash
+composer install
+npm install
+composer dev
+```
+
+That puts the recipe's own pages on `http://127.0.0.1:8000` — `src/` served by a
+real Laravel application, not a preview of it — and edits to
+`src/resources/js/**` hot-reload.
+
+`composer dev` is one terminal running four processes under `concurrently`: the
+Testbench server, a queue listener, Pail, and Vite. They live and die together
+(`--kill-others`), so a crash in any one of them takes the whole thing down —
+read the prefixes in the output to see which.
+
+`composer run serve` on its own is the same server without Vite, and Blade will
+die on a missing manifest unless `npm run build` has run at least once. Use it
+when you want the built assets rather than the dev server; otherwise use
+`composer dev`.
+
+Four pieces make that work, and it is worth knowing which is which:
+
+| | |
+|---|---|
+| `testbench.yaml` | Configures the skeleton. Its `sync` block symlinks `workbench/public` onto the skeleton's public directory, which is the only reason Vite and Blade agree on where the manifest lives. |
+| `workbench/` | The throwaway application — routes, models, seeders, the Inertia root view, and the `app.tsx` that mounts React. Committed here, never shipped. |
+| `vite.config.ts` | Entry points under `workbench/resources`, `publicDirectory` pointed at the symlink. |
+| `workbench/resources/js/app.tsx` | Resolves pages straight out of `../../../src/resources/js/pages`. |
+| `eslint.config.js` | The starter kit's, with the paths moved: its `resources/js` is our `workbench/resources/js`. Copy a newer one over and the `ignores` block silently stops matching — 45 vendored shadcn files start failing the lint and nothing tells you why. |
+| `vite.config.ts` `resolve.alias` | Makes `@/…` try `src/` before `workbench/`. See [Imports](#imports-and-the-two-component-roots). It has to be the array form: `laravel-vite-plugin` ships its own `@` → `/resources/js`, and only an array puts ours ahead of it. `customResolver` carries the fallback, and Vite 9 drops it — that is the line to rewrite when the warning becomes an error. |
+
+That last line is the whole trick, and it is deliberately dumb: the page name
+the harness resolves is the page name an installed project resolves.
+`Inertia::render('how-to-start')` finds
+`src/resources/js/pages/how-to-start.tsx` here and
+`resources/js/pages/how-to-start.tsx` there. A namespacing scheme — the sort a
+package shipping pages at runtime needs — would buy nothing and would mean
+developing against a name that does not survive installation.
+
+What the harness does **not** carry is the rest of a starter kit. There is no
+layout, no `ziggy`, no shadcn, no auth scaffolding. A page in `src/` that
+imports any of it renders here only if the recipe ships it too — which is the
+same bar the installed project sets, so it fails early rather than quietly.
+
+The rest of the scripts are Workbench's own: `composer run build` rebuilds the
+SQLite database and publishes assets, `composer run clear` purges the skeleton,
+`composer run prepare` re-runs package discovery.
+
+### For real, by installing it
+
+The question Workbench cannot answer yet — whether the payload lands correctly
+in a project. Install into one you do not mind losing, and note the installer
+fetches from GitHub, never from a working copy, so a change has to be pushed
+first:
 
 ```bash
 cpx fullsystem/install ../throwaway-app --recipe={org}/{repo} --dry-run

@@ -4,10 +4,10 @@ A recipe for [fullsystem/install](https://github.com/fullsystem/install): files
 that mirror a project root, and a `schema.json` saying what has to happen for
 them to work.
 
-This one does not do anything yet. It installs cleanly, replaces the starter
-kit's welcome page so you can see that it did, and declares no packages,
-deletions or commands. That is the starting point — what it becomes is written
-from here.
+This one does not do anything yet, and ships nothing: no pages, no packages, no
+deletions, no commands. What it does carry is the environment to build a recipe
+in and the rules for writing one. That is the starting point — what it becomes
+is written from here.
 
 ## How to use it
 
