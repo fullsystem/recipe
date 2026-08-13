@@ -1,9 +1,13 @@
 # {org}/{repo}
 
-A recipe: a Laravel + Inertia + React frontend, the packages it needs, and the
-conventions for working in it — installed into a project in one command, and
-documented well enough that an assistant can build on it without inventing
-anything.
+A recipe for [fullsystem/install](https://github.com/fullsystem/install): files
+that mirror a project root, and a `schema.json` saying what has to happen for
+them to work.
+
+This one does not do anything yet. It installs cleanly, replaces the starter
+kit's welcome page so you can see that it did, and declares no packages,
+deletions or commands. That is the starting point — what it becomes is written
+from here.
 
 ## How to use it
 
@@ -13,51 +17,27 @@ Give this URL to Claude, Cursor, or whatever you code with:
 https://raw.githubusercontent.com/{org}/{repo}/main/SKILL.md
 ```
 
-That is the whole instruction. It checks what your machine is missing, runs the
-installer, and hands over to the documentation that comes with the project.
-
-Or do it yourself:
+Or run the installer yourself, against a Laravel project using Inertia and
+React:
 
 ```bash
 cpx fullsystem/install --recipe={org}/{repo}
 ```
 
 Either way [fullsystem/install](https://github.com/fullsystem/install) does the
-work: it installs on a branch, proves the result lints, builds and tests, and
-puts everything back if any of that fails. Nothing is pushed.
+work: it installs on a branch, proves the result builds, and puts everything
+back if anything fails. Nothing is pushed.
 
-## What you get
+## Writing it
 
-| | |
-|---|---|
-| adds | `laravel/reverb`, `laravel/horizon`, `intervention/image`, `nunomaduro/essentials` |
-| adds, dev | `baconfy/factory-payload` |
-| adds, JS | `@laravel/echo-react`, `react-markdown`, `pusher-js`, `date-fns` |
-| runs | `shadcn init` and `add` — preset `vega`, template `laravel`, every component |
-| then | `php artisan wayfinder:generate --with-form` |
+`AGENTS.md` is the reference — the schema, the phases, the actions, and what the
+installer refuses. The short version:
 
-The frontend itself is being written. What is here today is the shape of it,
-not the finished thing.
-
-## Why it is built this way
-
-Most projects assume a person will read the docs and keep the conventions in
-their head. That assumption stopped being true, and what came out the other side
-is a lot of software that works and is not safe.
-
-So the conventions ship with the project. How to write a policy, how to validate
-a request, how anything here is meant to be done: it is in the repository, next
-to the code, and it is what an assistant reads before writing anything. Not a
-style guide nobody opens — the thing that is actually followed.
-
-## Making it your own
-
-This recipe is a starting point, and forking it is expected. Change what it
-installs, replace the frontend, keep the parts that suit you.
-
-Everything that names this repository is written as `{org}` and `{repo}`, so a
-copy points at itself rather than at where it came from. The skill fills them in
-when it sets a project up; if you fork by hand, they are what to search for.
+- files go in `src/`, laid out as they should sit in the installed project
+- `schema.json` declares what those files need around them: packages to install,
+  paths to remove, commands to run
+- the files come first and the schema follows from them, because what a recipe
+  needs is not knowable until the files exist
 
 ## License
 

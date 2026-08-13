@@ -68,9 +68,13 @@ break the build now that ours are in. A file this recipe simply does not use is
 not a reason to delete it. If you cannot name the file of ours that replaces it,
 or the breakage it causes, leave it alone.
 
-**Ship tests.** The installer runs the project's suite as the last step of every
-install, so a test shipped here is a test that runs on somebody else's machine
-before they are asked to keep the result.
+**Ship tests**, with one caveat worth knowing. The installer verifies the result
+before anyone is asked to keep it, but it only runs what the project declares:
+it looks for `composer lint`, `npm run build` and `composer test`, and skips
+whichever the project does not have. A fresh `laravel/react-starter-kit`
+declares only the build today, so a test shipped in a recipe may not run at
+install time. Ship them anyway — they run for whoever works in the project
+afterwards, which is where they matter most.
 
 ## The schema
 
@@ -89,8 +93,8 @@ Two, and both optional:
 
 - **`pre-install`** runs before the files land — packages they import, deletions
   that clear the way, components they build on.
-- **`post-install`** runs after — anything that reads them. `wayfinder:generate`
-  reads the routes this recipe just shipped, so it cannot run earlier.
+- **`post-install`** runs after — anything that reads them. A generator that
+  reads the routes a recipe just shipped cannot run before they are there.
 
 The phases between them — copying `src/` over the project, and verifying the
 result builds — belong to the installer. They cannot be reordered or skipped

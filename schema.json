@@ -2,54 +2,8 @@
   "name": "{org}/{repo}",
   "version": "0.1.0",
   "driver": "laravel-react",
-  "requires": [
-    "fresh-project"
-  ],
   "phases": {
-    "pre-install": [
-      {
-        "composer": [
-          "laravel/reverb",
-          "laravel/horizon",
-          "intervention/image",
-          "nunomaduro/essentials"
-        ]
-      },
-      {
-        "composer": [
-          "baconfy/factory-payload"
-        ],
-        "dev": true
-      },
-      {
-        "packages": [
-          "@laravel/echo-react",
-          "react-markdown",
-          "pusher-js",
-          "date-fns"
-        ]
-      },
-      {
-        "remove": [
-          "components.json",
-          "pnpm-workspace.yaml"
-        ]
-      },
-      {
-        "shadcn": {
-          "preset": "vega",
-          "template": "laravel",
-          "components": "all",
-          "pointer": true
-        }
-      }
-    ],
-    "post-install": [
-      {
-        "artisan": [
-          "wayfinder:generate --with-form"
-        ]
-      }
-    ]
+    "pre-install": [],
+    "post-install": []
   }
 }
