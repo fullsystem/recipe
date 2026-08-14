@@ -15,8 +15,8 @@ down while it was being built, and it lives in two places:
 
 | | |
 |---|---|
-| `.ai/` | Decisions, conventions and facts about this recipe — what it targets, how it is proved, what was settled and why. Never ships. |
-| `src/.ai/skills/` | How-to knowledge, starting with `write-knowledge.md`. Lives inside `src/` because it **ships**: every project this recipe installs into inherits it. |
+| `.ai/` | Decisions, conventions and facts about this recipe — what it targets, how it is proved, what was settled and why — plus `skills/`, the how-to knowledge for working on the recipe itself. Never ships. |
+| `src/.ai/skills/` | How-to knowledge for working in a project the recipe installs into, starting with `write-knowledge.md`. Lives inside `src/` because it **ships**: every such project inherits it. |
 
 **Before answering a question, deriving a fact, or asking the user anything:
 look in both first.** Knowledge kept growing after the build finished, and the

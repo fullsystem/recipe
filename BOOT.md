@@ -86,12 +86,23 @@ This is the bulk of it. The recipe does not exist yet — deciding what it
 delivers, proving it, and building it is what `.ai/steps/` describes, and
 working through that sequence is what booting this project means.
 
-The knowledge lives in two places:
+The knowledge lives in three places:
 
 | | |
 |---|---|
 | `.ai/steps/` | The sequence that takes this repository from empty template to finished recipe. Numbered and ordered; each step declares what it needs and what it leaves behind. Never ships. |
-| `src/.ai/skills/` | How-to knowledge the steps call on — starting with `write-knowledge.md`, the base for making and recording structural decisions. Lives inside `src/` because it **ships**: every project this recipe installs into inherits it. |
+| `.ai/skills/` | How-to knowledge for building the recipe — the work happening here, in this repository. Never ships. |
+| `src/.ai/skills/` | How-to knowledge for working in a project the recipe installs into — starting with `write-knowledge.md`, the base for making and recording structural decisions. Lives inside `src/` because it **ships**: every such project inherits it. |
+
+**Both skill directories are yours to use.** A step that calls on a skill does
+not care which side of `src/` it came from, and you should read whichever
+answers the question in front of you.
+
+What decides where a *new* skill goes is who needs it later. Knowledge about
+building a recipe stays in `.ai/skills/` and dies with this repository.
+Knowledge about working in an installed project goes in `src/.ai/skills/`, and
+every project this recipe touches inherits it — which is a promise worth making
+deliberately rather than by accident.
 
 ### Where am I?
 
