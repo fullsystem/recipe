@@ -38,6 +38,7 @@ Declare the layout, render the slots, and nothing else:
 
 ```tsx
 import { Head } from '@inertiajs/react';
+import { PageHeader } from '@/components/shell/page-header';
 import { InvoiceTable } from '@/components/domain/invoice/invoice-table';
 import AppLayout from '@/layouts/app-layout';
 import { index } from '@/routes/invoices';
@@ -48,14 +49,14 @@ type Props = { invoices: Invoice[] };
 export default function InvoicesPage({ invoices }: Props) {
     return (
         <>
-            <Head title="Invoices" />
-
+            <PageHeader title={"Invoices"} breadcrumbs={{ breadcrumbs: [{ title: 'Invoices', href: index() }] }} />
+           
             <InvoiceTable invoices={invoices} />
         </>
     );
 }
 
-InvoicesPage.layout = [AppLayout, { breadcrumbs: [{ title: 'Invoices', href: index() }] }];
+InvoicesPage.layout = AppLayout;
 ```
 
 The layout pairing is the page's one declaration about itself — see

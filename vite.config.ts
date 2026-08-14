@@ -49,6 +49,9 @@ export default defineConfig({
       command: 'php vendor/bin/testbench wayfinder:generate',
       path: 'workbench/resources/js',
       patterns: ['workbench/routes/**/*.php', 'workbench/app/**/Http/**/*.php'],
+      // The starter kit's forms call `Controller.action.form()`, which only
+      // exists when the form variants are generated.
+      formVariants: true,
     }),
   ],
 });
